@@ -31,7 +31,7 @@ Release page: [TBSCI-202611 Releases](https://github.com/enhua-xu/TBSCI-202611/r
 
 ## File conventions
 
-Each test-case directory contains the core set of files required to reproduce the reported calculations.
+Each test-case directory contains the input files needed to run the corresponding calculation, together with output files provided for reference.
 
 - **`*.FCIDUMP`**
 
@@ -54,7 +54,7 @@ Each test-case directory contains the core set of files required to reproduce th
   - `Nirp`: number of irreducible representations (irreps) of the point group (e.g., 8 for D2h, 4 for C2v). Default: `1`.
   - `Target_irp`: target irreducible representation (symmetry sector) for the ground-state calculation. Default: `0`.
   - `Conv`: energy convergence threshold. Default: `1.0D-7`.
-  - `Theta`: convergence threshold for the residual 2-norm, $\|\mathbf{r}\|_2$, where $\mathbf{r} = \mathbf{W}^{*} - E\mathbf{U}$. Default: `1.0D-4`.
+  - `Theta`: convergence threshold for the residual 2-norm. Default: `1.0D-4`.
 
 - **`*.strA` and `*.strB`**
 
@@ -70,9 +70,9 @@ Each test-case directory contains the core set of files required to reproduce th
 
 - **`*.out`**
 
-  In `FCI_results/`, each test case contains a single output file from an FCI calculation iterated to convergence.
+  In `FCI_results/`, a single output file is provided for the `N2_TZ_42` FCI calculation, which was iterated to convergence.
 
-  In `TBSCI_results/`, multiple output files are provided for each test case. For the closed-shell systems reported here, `nAlpha = nBeta`, and therefore only a single number appears in the filename. Using the same `nAlpha` and `nBeta` values should reproduce results that are nearly identical to the corresponding outputs.
+  In `TBSCI_results/`, output files are provided for six geometries along the N₂ potential energy surface. For these closed-shell calculations, `nAlpha = nBeta`, so only one bitstring count appears in each output filename. Using the corresponding input files and bitstring counts should reproduce results nearly identical to the provided outputs.
 
 ---
 
@@ -114,11 +114,12 @@ source /opt/intel/oneapi/setvars.sh
 **Run** (Intel executable example; `mpirun`/`mpiexec` depending on system):
 
 ```bash
-mpirun -np <nproc> /path/to/Intel_exe.out <prefix> <nAlpha> <nBeta> <nThreads>
+mpirun -np <nprocs> /path/to/Intel_exe.out <prefix> <nAlpha> <nBeta> <nThreads>
 ```
 
 Here:
 
+- `<nprocs>` is the number of MPI processes to launch.
 - `<prefix>` is the name of the selected test case (e.g., `N2_TZ`), used to locate the corresponding input files (`<prefix>.FCIDUMP`, `<prefix>.strA`, `<prefix>.strB`, `<prefix>.input`, and `<prefix>.charT`).
 - `<nAlpha>` is the number of alpha bitstrings to include in the TBSCI calculation.
 - `<nBeta>` is the number of beta bitstrings to include in the TBSCI calculation.
@@ -126,7 +127,7 @@ Here:
 
 **Notes:**
 
-- `<nAlpha>` and `<nBeta>` must each be ≥ `<nproc>`; otherwise, CI-vector segments cannot be distributed across MPI processes.
+- `<nAlpha>` and `<nBeta>` must each be ≥ `<nprocs>`; otherwise, CI-vector segments cannot be distributed across MPI processes.
 - `<nThreads>` must be > `1`. One OpenMP thread is dedicated to data fetching, while the remaining threads are used for computation.
 
 ---
